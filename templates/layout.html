@@ -1,0 +1,25 @@
+<!doctype html>
+<title>Flask task manager</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
+<div class=page>
+  <h1>Flask task manager</h1>
+  <div class=metanav>
+  {% if not session.logged_in %}
+    <a href="{{ url_for('login') }}">log in</a>
+  {% else %}
+    <a href="{{ url_for('logout') }}">log out</a>
+  {% endif %}
+  </div>
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+<script src = "{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
+<script src = "{{ url_for('static', filename='js/jquery.serialize-object.js') }}"></script>
+<script src = "{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+<script src = "{{ url_for('static', filename='js/app.js') }}"></script>
