@@ -1,16 +1,21 @@
 {% extends "layout.html" %}
 {% block body %}
   {% if session.logged_in %}
-    <form method=post class=add-entry id="task-manager">
+    <form method=post class=add-entry id="task-manager"> <!-- in far future add validation-->
       <dl>
         <dt>Task:</dt>
         <dd><input type="text" size="30" name="title" class="form-control"></dd>
         <dt>Description:</dt>
         <dd><textarea name="description" rows="5" cols="40" class="form-control"></textarea></dd>
         <dt>Time for task:</dt>
-        <dd><input type="text" size="30" name = "timefortask" class="form-control"></dd>
-        <dt>Day, when task should be done</dt>
-        <dd><input type="text" size="30" name = "dateofexecuting" class="form-control"></dd>
+        <dd>
+          <select size="1" name = "timefortask" class="form-control" id = "timeselector">
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="60">1 hr</option>
+            <option value="90">1 hr 30 min</option>
+          </select>
+        </dd>
         <br>
         <dd><button class="btn btn-default" type="submit" value="Submit" id="submit">Submit</button></dd>
       </dl>
@@ -18,19 +23,16 @@
   {% endif %}
   <ul class=entries>
   {% for entry in entries %}
-    <li>
+    <li id ={{ entry.id }}>
       <h2>{{ entry.title }}
-        <span id="timer"></span>
-        <button class="btn btn-default">Start task</button>
-        <button class="btn btn-default">Suspend task</button>
-        <button class="btn btn-default">Finish task</button>
+        <span id="{{entry.id}}timer"></span>
+        <button class="btn btn-default btn-primary" id="{{entry.id}}primary">Start task</button>
+        <button class="btn btn-default btn-info" id="{{entry.id}}info">Finish task</button>
       </h2>
       <h4>Description</h4>
       <p>{{ entry.description|safe }}</p>
       <h4>Time for task</h4>
-      <p>{{ entry.timefortask }}</p>
-      <h4>When should be executed</h4>
-      <p>{{ entry.dateofexecuting }}</p>
+      <p id="time{{entry.id}}">{{ entry.timefortask }}</p>
     </li>
   {% else %}
     <li><em>No entries here so far</em></li>
