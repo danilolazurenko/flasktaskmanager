@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+  <p>Overall {{overall_time}} hours spent.</p>
+  <ul class=entries>
+
+  {% for entry in entries %}
+    <li id ={{ entry.id }}>
+      Spent {{ entry.timespent }} minutes on {{ entry.title|safe }}.
+    </li>
+  {% else %}
+    <li><em>No entries here so far</em></li>
+  {% endfor %}
+
+  </ul>
+{% endblock %}

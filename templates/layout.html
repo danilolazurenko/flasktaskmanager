@@ -10,6 +10,9 @@
   {% else %}
     <a href="{{ url_for('logout') }}">log out</a>
   {% endif %}
+    |<a href = "{{ url_for('register') }}">register</a>
+    |<a href = "{{ url_for('show_tasks')}}">to main page</a>
+    |<a href = "{{ url_for('show_statistics')}}">statistics</a>
   </div>
   {% for message in get_flashed_messages() %}
     <div class=flash>{{ message }}</div>
@@ -20,6 +23,5 @@
   $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 </script>
 <script src = "{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
-<script src = "{{ url_for('static', filename='js/jquery.serialize-object.js') }}"></script>
 <script src = "{{ url_for('static', filename='js/bootstrap.js') }}"></script>
-<script src = "{{ url_for('static', filename='js/app.js') }}"></script>
+<script src = "{{ url_for('static', filename='js/app_test.js') }}"></script>
