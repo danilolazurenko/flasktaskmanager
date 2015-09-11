@@ -148,7 +148,7 @@ var submitTask = function(){
           if (FirstnessFlag == true) {TimeElapsed = 0; FirstnessFlag = false;}
           var needed_id = $(this).attr('id');
           needed_id = needed_id.substring(0, needed_id.length-1);
-          ar info_sel = '#'+needed_id + 'i';
+          var info_sel = '#'+needed_id + 'i';
           $( info_sel ).removeClass('disabled');
           $('.btn-primary').addClass('disabled');
           StartTimeStorage = new Date();
