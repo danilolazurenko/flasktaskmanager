@@ -11,11 +11,8 @@ $('.btn-primary').on("click", function(){
           if (FirstnessFlag == true) {TimeElapsed = 0; FirstnessFlag = false;}
           var needed_id = $(this).attr('id');
           needed_id = needed_id.substring(0, needed_id.length-1);
-          /*var info_sel = '#'+needed_id + 'i';
-          var finish_sel = '#' + needed_id +'f';
-          var edit_sel = '#' + needed_id + 'w';
-          var delete_sel = '#' + needed_id +'d';*/
-          $( "button" ).removeClass('disabled');
+          var info_sel = '#'+needed_id + 'i';
+          $( info_sel ).removeClass('disabled');
           $('.btn-primary').addClass('disabled');
           StartTimeStorage = new Date();
           timeVar = setInterval(function(){timerFunction()}, 1000)
@@ -30,9 +27,19 @@ $('.btn-primary').on("click", function(){
 
 $('.btn-info').on("click", function(){
   clearInterval(timeVar);
+  var needed_id = $(this).attr('id');
+  needed_id = needed_id.substring(0, needed_id.length-1);
+  var start_sel = '#'+needed_id + 'p';
+  var info_sel = '#'+needed_id + 'i';
+  var finish_sel = '#' + needed_id +'f';
+  var edit_sel = '#' + needed_id + 'w';
+  var delete_sel = '#' + needed_id +'d';
   TimeElapsed += d-StartTimeStorage;
-  $('.btn-info').addClass('disabled');
-  $('.btn-primary').removeClass('disabled');
+  $( info_sel).addClass('disabled');
+  $( start_sel ).removeClass('disabled');
+  $( finish_sel ).removeClass('disabled');
+  $( edit_sel ).removeClass('disabled');
+  $( delete_sel ).removeClass('disabled');
   });
 
 $('.btn-success').on("click", function(){
@@ -41,8 +48,6 @@ $('.btn-success').on("click", function(){
                           var title_selector = '#'+needed_id +'title';
                           var task_title = $(title_selector).text();
                           clearInterval(timeVar);
-                          $('button').addClass('disabled');
-                          $('.btn-primary').removeClass('disabled');
                                   $.ajax({
                                     url: $SCRIPT_ROOT + '/finishtask',
                                     data: {"title": task_title, "timespent": TimeElapsed, "id": needed_id},
@@ -143,11 +148,8 @@ var submitTask = function(){
           if (FirstnessFlag == true) {TimeElapsed = 0; FirstnessFlag = false;}
           var needed_id = $(this).attr('id');
           needed_id = needed_id.substring(0, needed_id.length-1);
-          /*var info_sel = '#'+needed_id + 'i';
-          var finish_sel = '#' + needed_id +'f';
-          var edit_sel = '#' + needed_id + 'w';
-          var delete_sel = '#' + needed_id +'d';*/
-          $( "button" ).removeClass('disabled');
+          ar info_sel = '#'+needed_id + 'i';
+          $( info_sel ).removeClass('disabled');
           $('.btn-primary').addClass('disabled');
           StartTimeStorage = new Date();
           timeVar = setInterval(function(){timerFunction()}, 1000)
@@ -161,11 +163,21 @@ var submitTask = function(){
         });
 
         $('#'+info_sel).on("click", function(){
-                        clearInterval(timeVar);
-                        TimeElapsed += d-StartTimeStorage;
-                        $('.btn-info').addClass('disabled');
-                        $('.btn-primary').removeClass('disabled');
-                        });
+              clearInterval(timeVar);
+              var needed_id = $(this).attr('id');
+              needed_id = needed_id.substring(0, needed_id.length-1);
+              var start_sel = '#'+needed_id + 'p';
+              var info_sel = '#'+needed_id + 'i';
+              var finish_sel = '#' + needed_id +'f';
+              var edit_sel = '#' + needed_id + 'w';
+              var delete_sel = '#' + needed_id +'d';
+              TimeElapsed += d-StartTimeStorage;
+              $( info_sel).addClass('disabled');
+              $( start_sel ).removeClass('disabled');
+              $( finish_sel ).removeClass('disabled');
+              $( edit_sel ).removeClass('disabled');
+              $( delete_sel ).removeClass('disabled');
+            });
 
         $('#'+finish_sel).on("click", function(){
                           var needed_id = $(this).attr('id');
@@ -173,8 +185,6 @@ var submitTask = function(){
                           var title_selector = '#'+needed_id +'title';
                           var task_title = $(title_selector).text();
                           clearInterval(timeVar);
-                          $('button').addClass('disabled');
-                          $('.btn-primary').removeClass('disabled');
                                   $.ajax({
                                     url: $SCRIPT_ROOT + '/finishtask',
                                     data: {"title": task_title, "timespent": TimeElapsed, "id": needed_id},
@@ -206,6 +216,7 @@ var submitTask = function(){
                           var title_selector = '#'+needed_id +'title';
                           var task_title = $(title_selector).text();
                           var timeToSend = $(".time-corrector").val();
+                          timeToSend *=3600000;
                                   $.ajax({
                                     url: $SCRIPT_ROOT + '/finishtask',
                                     data: {'title': task_title, 'timespent': timeToSend, "id": needed_id},

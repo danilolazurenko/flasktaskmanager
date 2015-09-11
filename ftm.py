@@ -85,7 +85,7 @@ def finish_task():
         abort(401)
     g.db.execute('insert into statistics (title, timespent) values (?, ?)', [request.form['title'], request.form['timespent']])
     g.db.commit()
-    g.db.execute('delete from tasks where id = (?)', request.form['id'])
+    g.db.execute('delete from tasks where id = (?)', [request.form['id']])
     g.db.commit()
     flash('Task finished')
     return json.dumps({'status': 'ok'})
