@@ -4,9 +4,9 @@
     <form method=post class=add-entry id="task-manager">
       <dl>
         <dt>Task:</dt>
-        <dd><input type="text" size="30" name="title" class="form-control"></dd>
+        <dd><input type="text" name="title" class="form-control"></dd>
         <dt>Description:</dt>
-        <dd><textarea name="description" rows="5" cols="40" class="form-control"></textarea></dd>
+        <dd><textarea name="description" class="form-control"></textarea></dd>
         <br>
         <dd><button class="btn btn-default" type="submit" value="Submit" id="submit">Submit</button></dd>
       </dl>
@@ -15,20 +15,21 @@
   <ul class=entries>
   {% for entry in entries %}
     <li id ={{ entry.id }}>
-      <h3><span id = "{{entry.id}}title">{{ entry.title }}</span>
-        <span id="{{entry.id}}r"></span>
-        <button class="btn btn-primary" id="{{entry.id}}p">Start task</button>
-        <button class="btn btn-info disabled" id="{{entry.id}}i">Stop time</button>
-        <button class="btn btn-success disabled" id="{{entry.id}}f">Finish task</button>
-        <button class="btn btn-warning disabled" id="{{entry.id}}w">Edit time</button>
-        <button class="btn btn-danger disabled" id="{{entry.id}}d">Delete task</button>
+      <h3><span id = "title_{{entry.id}}">{{ entry.title }}</span>
+        <span id="timer_{{entry.id}}"></span>
+        <button class="btn btn-primary" id="start_{{entry.id}}">Start task</button>
+        <button class="btn btn-info disabled" id="stop_{{entry.id}}">Stop time</button>
+        <button class="btn btn-success disabled" id="finish_{{entry.id}}">Finish task</button>
+        <button class="btn btn-warning disabled" id="edit_{{entry.id}}">Edit time</button>
+        <button class="btn btn-danger disabled" id="delete_{{entry.id}}">Delete task</button>
       </h3>
       <h4>Description</h4>
       <p>{{ entry.description|safe }}</p>
-      <p><span id="{{entry.id}}c"></span></p>
+      <p><span id="editor_{{entry.id}}"></span></p>
     </li>
   {% else %}
     <li><em>No entries here so far</em></li>
   {% endfor %}
   </ul>
+
 {% endblock %}

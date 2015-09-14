@@ -1,38 +1,17 @@
-#import sqlite3
+
 from connector.connect_db import connect_db
 import json
 from os import path
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash
-from contextlib import closing
 
-# to do: make authorization later
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_pyfile('ftm-config.cfg')
-path_to_database = app.config['DATABASE']
+path_to_database = path.join('database', 'ftm.db')
 superuser = app.config['USERNAME']
 superpassword = app.config['PASSWORD']
-
-
-def init_db(path_to_db):
-    with closing(connect_db(path_to_db)) as db:
-        ftm_path = path.join('initdb', 'schema.sql')
-        with app.open_resource(ftm_path, mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-
-def database_initializer():
-    if not path.isfile(path_to_database):
-        init_db(path_to_database)
-        return True
-    else:
-        return False
-
-
-database_initializer()
 
 
 @app.before_request
@@ -60,10 +39,10 @@ def show_statistics():
     entries = [dict(id=row[0], title=row[1], timespent=row[2]) for row in cur.fetchall()]
     sum_of_times = 0
     for i in entries:
-        i['timespent'] = i['timespent']/60000.0
+        i['timespent'] /= 60000.0
         sum_of_times += i['timespent']
-    sum_of_times = sum_of_times/60.0
-    return render_template('show_statistics.html', entries=entries, overall_time = sum_of_times)
+    sum_of_times /= 60.0
+    return render_template('show_statistics.html', entries=entries, overall_time=sum_of_times)
 
 
 @app.route('/add', methods=['POST'])
@@ -79,7 +58,7 @@ def add_entry():
     return json.dumps({'status': 'ok', 'id': task_id[0]})
 
 
-@app.route('/finishtask', methods = ['POST'])
+@app.route('/finishtask', methods=['POST'])
 def finish_task():
     if not session.get('logged_in'):
         abort(401)
