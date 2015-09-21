@@ -15,6 +15,11 @@ create table logins_passwords (
 create table statistics (
   id integer primary key autoincrement,
   title text not null,
-  timespent integer
+  timespent integer,
+  startdate text not null,
+  enddate text not null,
+  starttime text not null,
+  endtime text not null,
+  description text
 );
 

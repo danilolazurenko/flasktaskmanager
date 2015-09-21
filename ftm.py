@@ -1,5 +1,5 @@
 
-from connector.connect_db import connect_db
+from db.connect_db import connect_db
 import json
 from os import path
 from flask import Flask, request, session, g, redirect, url_for, \
@@ -35,8 +35,9 @@ def show_tasks():
 
 @app.route('/statistics', methods=['GET', 'POST'])
 def show_statistics():
-    cur = g.db.execute('select id, title, timespent from statistics order by id desc')
-    entries = [dict(id=row[0], title=row[1], timespent=row[2]) for row in cur.fetchall()]
+    cur = g.db.execute('select id, title, timespent, startdate, enddate, starttime, endtime, description from statistics order by id desc')
+    entries = [dict(id=row[0], title=row[1], timespent=row[2], startdate=row[3], enddate=row[4], starttime=row[5],\
+                    endtime=row[6], description=row[7]) for row in cur.fetchall()]
     sum_of_times = 0
     for i in entries:
         i['timespent'] /= 60000.0
@@ -62,7 +63,9 @@ def add_entry():
 def finish_task():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into statistics (title, timespent) values (?, ?)', [request.form['title'], request.form['timespent']])
+    g.db.execute('insert into statistics (title, timespent, startdate, enddate, starttime, endtime, description) values (?, ?, ?, ?, ?, ?, ?)', \
+                 [request.form['title'], request.form['timespent'], request.form['startdate'], request.form['enddate'], \
+                  request.form['starttime'], request.form['endtime'], request.form['description']])
     g.db.commit()
     g.db.execute('delete from tasks where id = (?)', [request.form['id']])
     g.db.commit()

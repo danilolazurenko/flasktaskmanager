@@ -24,11 +24,10 @@
         <button class="btn btn-danger disabled" id="delete_{{entry.id}}">Delete task</button>
       </h3>
       <h4>Description</h4>
-      <p>{{ entry.description|safe }}</p>
+      <p id="descr_{{entry.id}}">{{ entry.description|safe }}</p>
       <p><span id="editor_{{entry.id}}"></span></p>
     </li>
-  {% else %}
-    <li><em>No entries here so far</em></li>
+
   {% endfor %}
   </ul>
 
