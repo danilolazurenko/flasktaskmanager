@@ -3,15 +3,23 @@
   <p>Overall {{overall_time}} hours spent.</p>
   <ul class=entries>
 
-    <table class="table">
+    <table class="table table-bordered">
       <tr>
-        <td>Title</td><td>Description</td><td>Time Spent</td>
-        <td>Start time</td><td>End time</td><td>Start Date</td><td>End Date</td>
+        <td>Title</td> <td>Description</td> <td>Status</td> <td>Start time-End time</td>
       </tr>
-  {% for entry in entries %}
-    <tr id ={{ entry.id }}>
-      <td>{{ entry.title|safe }}</td> <td>{{entry.description|safe}}</td><td>{{ entry.timespent }}</td>
-      <td>{{ entry.starttime }}</td><td>{{entry.endtime}}</td><td>{{entry.startdate}}</td><td>{{entry.enddate}}</td>
+  {% for task in tasks %}
+    <tr id ={{ task.id }}>
+      <td>{{ task.title|safe }}</td>
+      <td>{{ task.description|safe }}</td>
+      <td>{{ task.status }}</td>
+      <td>
+
+          {% for entry in task.entries %}
+          {{ entry.starttime }}-{{entry.endtime}}<br>
+          {% endfor %}
+
+      </td>
+
     </tr>
   {% else %}
     <tr><em>No entries here so far</em></tr>

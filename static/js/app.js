@@ -10,6 +10,7 @@ var EndTimeString;
 var dateObject;
 var timeObject
 var TimeElapsed;
+var DateTimeStorage;
 var FirstnessFlag = true;
 var ButtonList = [ 'start', 'stop', 'finish', 'edit', 'delete'];
 
@@ -38,20 +39,32 @@ function getNeededId(self){
   var neededId = manipulator.attr('id').split('_')[1];//getting unique general value of id
   return neededId;
 };
+// function for updating time of task
+function updateTimeData(s_datetime, e_datetime, status, task_id){
+  $.ajax({
+    url: $SCRIPT_ROOT + '/updatetask',
+    data: {'StartingTime': s_datetime, 'EndingTime': e_datetime, 'status': status, 'task_id': task_id},
+    type: 'POST',
+    success: function(response){},
+    error: function(response){ handleResponseFromServer(response); }
+  });
+};
 //start task function
 function startTask(self){
   //if (self.attr('class') == 'disabled'){ return;}
   if (FirstnessFlag == true) {
     TimeElapsed = 0;
     FirstnessFlag = false;
-    StartDate = new Date();
-    StartTimeString = StartDate.toLocaleTimeString();
-    StartDateString = StartDate.toLocaleDateString();
     }
+  StartDate = new Date();
+  StartTimeString = StartDate.toLocaleTimeString();
+  StartDateString = StartDate.toLocaleDateString();
   var neededId = getNeededId(self);
   var stopsel = '#stop_'+neededId;
   $( stopsel ).removeClass('disabled');
   $('.btn-primary').addClass('disabled');
+  DateTimeStorage = s_datetime = StartDateString.concat('|',StartTimeString);
+  updateTimeData(s_datetime, 'Now', 'idle', neededId);
   StartTimeStorage = new Date();
   timeVar = setInterval(function(){timerFunction(neededId)}, 1000)
 };
@@ -73,27 +86,24 @@ function stopTask(self){
   $( selectorArray['edit'] ).removeClass('disabled');
   $( selectorArray['delete'] ).removeClass('disabled');
   $( selectorArray['stop'] ).addClass('disabled');
+  var neededId = getNeededId(self);
+  EndDate = new Date();
+  EndTimeString = EndDate.toLocaleTimeString();
+  EndDateString = EndDate.toLocaleDateString();
+  e_datetime = EndDateString.concat('|', EndTimeString)
+  updateTimeData(DateTimeStorage, e_datetime, 'idle', neededId);
 };
 //function for finishing task and adding it's data to statistics
 function finishTask(self){
   clearInterval(timeVar);
   var neededId = getNeededId(self);
-  var titleSelector = '#title_'+neededId;
-  var taskTitle = $(titleSelector).text();
-  var taskDescription = $('#descr_'+neededId).text();
   EndDate = new Date();
-  EndDateString = EndDate.toLocaleDateString();
   EndTimeString = EndDate.toLocaleTimeString();
-  $.ajax({
-    url: $SCRIPT_ROOT + '/finishtask',
-      data: { "title": taskTitle, "timespent": TimeElapsed, "id": neededId,
-              "startdate": StartDateString, "starttime": StartTimeString,
-              "enddate": EndDateString, "endtime": EndTimeString,
-              "description": taskDescription},
-      type: 'POST',
-      success: function(response){ returnToBeginning(neededId); console.log(response); },
-      error: function(response){ alert("Sorry, some error occured, try again."); }
-  });
+  EndDateString = EndDate.toLocaleDateString();
+  e_datetime = EndDateString.concat('|',EndTimeString);
+  updateTimeData(DateTimeStorage, e_datetime, 'finished', neededId);
+  sel = '#'+neededId;
+  $(sel).remove();
 };
 //function for editing time before adding it to statistics
 function editTask(self){
@@ -104,29 +114,21 @@ function editTask(self){
   $(sel).append(StringToAppend);
   $(".corrector").on("click", function(){
     var submitCorrection = submitCorrectedData(this);
+    del_sel = '#'+neededId;
+    $(del_sel).remove();
     });
 };
 //function that sends corrected data to server
 function submitCorrectedData(self){
   var neededId = getNeededId(self);
-  var titleSelector = '#title'+neededId;
-  var taskTitle = $(titleSelector).text();
   var timeToSend = $(".time-corrector").val();
-  var taskDescription = $('#descr_'+neededId).text();
   timeToSend *=3600000;
-  EndDate = new Date();
+  TimeVal = StartTimeStorage.getTime();
+  EndDate = new Date(timeToSend+TimeVal);
   EndDateString = EndDate.toLocaleDateString();
   EndTimeString = EndDate.toLocaleTimeString();
-  $.ajax({
-    url: $SCRIPT_ROOT + '/finishtask',
-    data: {'title': taskTitle, 'timespent': timeToSend, "id": neededId,
-              "startdate": StartDateString, "starttime": StartTimeString,
-              "enddate": EndDateString, "endtime": EndTimeString,
-              "description": taskDescription},
-    type: 'POST',
-    success: function(response){ returnToBeginning(neededId); },
-    error: function(response){ alert("An error occured, please try again or telephone to admin.");}
-    });
+  e_datetime = EndDateString.concat('|', EndTimeString);
+  updateTimeData(DateTimeStorage, e_datetime, 'finished', neededId);
 };
 //function for deleting task
 function deleteTask(self){
@@ -137,16 +139,14 @@ function deleteTask(self){
     data: {'id': neededId},
     type: 'POST',
     success: function(response){ returnToBeginning(neededId); },
-    error: function(response){ alert('Error during deletion happened, try again.')}
+    error: function(response){ handleResponseFromServer(response); }
   });
-}
-
+};
 //function for getting id list of list of selectors; "this" is needed, why?
 function createIdList(prefix, Id){
   this.ButtonsIdArray = {};
   this.tmpId;
   for ( var key in ButtonList ){
-    //this.tmpId = prefix.concat(ButtonList[key], '_' ,Id);
     this.ButtonsIdArray[ButtonList[key]]=prefix.concat(ButtonList[key], '_' ,Id);
     }
   return this.ButtonsIdArray
@@ -161,6 +161,13 @@ function returnToBeginning(neededId){
   $('.btn-primary').removeClass('disabled');
   $('.btn-default').removeClass('disabled');
 };
+/*function for handling response from server*/
+function handleResponseFromServer(response){
+  if (response.status == 401){alert('Log in, please.');}
+  else if (response.status == 403){ alert('You performed forbidden operation. If you did nothing call admin.'); }
+  else if (response.status == 500){ alert('An error happened on server side. Call admin or come later.');}
+};
+
 
 $(document).ready(function(){
 
@@ -228,6 +235,6 @@ var submitTask = function(){
         });
 
       },
-      error: function(response){ alert('Something bad happened.'); }
+      error: function(response){ handleResponseFromServer(response); }
     });
   };

@@ -1,7 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
+<head>
 <title>Flask task manager</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
 <div class=page>
   <h1>Flask task manager</h1>
   <div class=metanav>
@@ -26,3 +29,4 @@
 <script src = "{{ url_for('static', filename='js/underscore.js') }}"></script>
 <script src = "{{ url_for('static', filename='js/bootstrap.js') }}"></script>
 <script src = "{{ url_for('static', filename='js/app.js') }}"></script>
+</body>

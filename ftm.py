@@ -1,4 +1,4 @@
-
+# todo: fully redesign app, make it work smoothly, if after reforming it won't be payed, go to next task
 from db.connect_db import connect_db
 import json
 from os import path
@@ -28,48 +28,43 @@ def teardown_request(exception):
 
 @app.route('/', methods=['GET', 'POST'])
 def show_tasks():
-    cur = g.db.execute('select id, title, description from tasks order by id desc')
+    cur = g.db.execute('select id, title, description from tasks where status = "idle" or status = "not_started" order by id desc')
     entries = [dict(id=row[0], title=row[1], description=row[2]) for row in cur.fetchall()]
     return render_template('show_tasks.html', entries=entries)
 
 
 @app.route('/statistics', methods=['GET', 'POST'])
 def show_statistics():
-    cur = g.db.execute('select id, title, timespent, startdate, enddate, starttime, endtime, description from statistics order by id desc')
-    entries = [dict(id=row[0], title=row[1], timespent=row[2], startdate=row[3], enddate=row[4], starttime=row[5],\
-                    endtime=row[6], description=row[7]) for row in cur.fetchall()]
-    sum_of_times = 0
-    for i in entries:
-        i['timespent'] /= 60000.0
-        sum_of_times += i['timespent']
-    sum_of_times /= 60.0
-    return render_template('show_statistics.html', entries=entries, overall_time=sum_of_times)
+    cur = g.db.execute('select id, title, description, status from tasks order by id desc')
+    tasks = [dict(id=row[0], title=row[1], description=row[2], status=row[3]) for row in cur.fetchall()]
+    for i in tasks:
+        cur = g.db.execute('select statistics_id, starttime, endtime from tasks_statistics where track_period = (?) order by statistics_id desc', [i['id']])
+        i['entries'] = [dict(id=row[0], starttime=row[1], endtime=row[2]) for row in cur.fetchall()]
+    return render_template('show_statistics.html', tasks=tasks)
 
 
 @app.route('/add', methods=['POST'])
 def add_entry():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into tasks (title, description) values (?, ?)',
-                 [request.form['title'], request.form['description']])
+    g.db.execute('insert into tasks (title, description, status, timespent) values (?, ?, ?, ?)',
+                 [request.form['title'], request.form['description'], 'not_started', 0.0])
     g.db.commit()
-    flash('New task was successfully posted')
-    cur = g.db.execute('select id from tasks where description = (?) and title = (?)', [request.form['description'], request.form['title']])
+    cur = g.db.execute('select id from tasks where description = (?) and title = (?) and status = (?)', \
+                       [request.form['description'], request.form['title'], 'not_started'])
     task_id = [dict(id=row[0]) for row in cur.fetchall()]
     return json.dumps({'status': 'ok', 'id': task_id[0]})
 
 
-@app.route('/finishtask', methods=['POST'])
-def finish_task():
+@app.route('/updatetask', methods=['POST'])
+def update_entry():
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into statistics (title, timespent, startdate, enddate, starttime, endtime, description) values (?, ?, ?, ?, ?, ?, ?)', \
-                 [request.form['title'], request.form['timespent'], request.form['startdate'], request.form['enddate'], \
-                  request.form['starttime'], request.form['endtime'], request.form['description']])
+    g.db.execute('update tasks set status = (?) where id = (?)', [request.form['status'], request.form['task_id']])
     g.db.commit()
-    g.db.execute('delete from tasks where id = (?)', [request.form['id']])
+    g.db.execute('insert into tasks_statistics (starttime, endtime, track_period) values (?, ?, ?)', \
+                 [request.form['StartingTime'], request.form['EndingTime'], request.form['task_id']])
     g.db.commit()
-    flash('Task finished')
     return json.dumps({'status': 'ok'})
 
 

@@ -4,3 +4,6 @@
 *.pyc
 #database
 database/
+#personal config
+.cfg
+

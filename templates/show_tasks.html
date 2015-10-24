@@ -1,17 +1,19 @@
 {% extends "layout.html" %}
 {% block body %}
   {% if session.logged_in %}
-    <form method=post class=add-entry id="task-manager">
-      <dl>
-        <dt>Task:</dt>
-        <dd><input type="text" name="title" class="form-control"></dd>
-        <dt>Description:</dt>
-        <dd><textarea name="description" class="form-control"></textarea></dd>
+    <form method=post class='add-entry form-group' id="task-manager">
+        Task:
+        <input type="text" name="title" class="form-control">
         <br>
-        <dd><button class="btn btn-default" type="submit" value="Submit" id="submit">Submit</button></dd>
-      </dl>
+        Description:
+        <textarea name="description" class="form-control"></textarea>
+        <br>
+        <button class="btn btn-default" type="submit" value="Submit" id="submit">Submit</button>
+
+        <br>
     </form>
-  {% endif %}
+<br>
+
   <ul class=entries>
   {% for entry in entries %}
     <li id ={{ entry.id }}>
@@ -24,11 +26,11 @@
         <button class="btn btn-danger disabled" id="delete_{{entry.id}}">Delete task</button>
       </h3>
       <h4>Description</h4>
+      {% if entry.status == 'idle' %}<p> This is unfinished task, are you sure about it's end time? </p>{% endif %}
       <p id="descr_{{entry.id}}">{{ entry.description|safe }}</p>
       <p><span id="editor_{{entry.id}}"></span></p>
     </li>
-
   {% endfor %}
   </ul>
-
+  {% endif %}
 {% endblock %}
